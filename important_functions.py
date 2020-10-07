@@ -17,9 +17,25 @@ def move_file(file_path, dst_dir):
     try:
         shutil.move(file_path, dst_dir)
     except OSError:
-        print("Moving of the file %s failed" % file_path)
+        shutil.move(file_path, f'{dst_dir}/{os.path.basename(get_nonexistant_path(file_path))}')
+        # print("Moving of the file %s failed" % file_path)
     else:
         print("{} File Moved to: {}".format(file_path, dst_dir))
+
+
+def get_nonexistant_path(fname_path):
+    """
+    Get the path to a filename which does not exist by incrementing path.
+    """
+    if not os.path.exists(fname_path):
+        return fname_path
+    filename, file_extension = os.path.splitext(fname_path)
+    i = 1
+    new_fname = "{}_{}{}".format(filename, i, file_extension)
+    while os.path.exists(new_fname):
+        i += 1
+        new_fname = "{}_{}{}".format(filename, i, file_extension)
+    return new_fname
 
 
 # Delete file
@@ -97,7 +113,7 @@ def categorize_file(destination_dir, path_dictionaries, file_full_text):
                                            file_dic['level_three_dir']))
             create_file_text(file_dic['file_path'],
                              '{}/{}/{}/{}'.format(destination_dir, file_dic['level_one_dir'], file_dic['level_two_dir'],
-                                       file_dic['level_three_dir']), file_full_text)
+                                                  file_dic['level_three_dir']), file_full_text)
             return
 
         for file_dic_two in path_dictionaries:
@@ -106,12 +122,15 @@ def categorize_file(destination_dir, path_dictionaries, file_full_text):
                 # create level one folder
                 create_folder(destination_dir, file_dic_two['level_one_dir'])
                 # create level two folder
-                create_folder('{}/{}'.format(destination_dir, file_dic_two['level_one_dir']), file_dic_two['level_two_dir'])
+                create_folder('{}/{}'.format(destination_dir, file_dic_two['level_one_dir']),
+                              file_dic_two['level_two_dir'])
                 # move file
                 move_file(file_dic_two['file_path'],
-                          '{}/{}/{}'.format(destination_dir, file_dic_two['level_one_dir'], file_dic_two['level_two_dir']))
+                          '{}/{}/{}'.format(destination_dir, file_dic_two['level_one_dir'],
+                                            file_dic_two['level_two_dir']))
                 create_file_text(file_dic['file_path'],
-                                 '{}/{}/{}'.format(destination_dir, file_dic_two['level_one_dir'], file_dic_two['level_two_dir']), file_full_text)
+                                 '{}/{}/{}'.format(destination_dir, file_dic_two['level_one_dir'],
+                                                   file_dic_two['level_two_dir']), file_full_text)
                 return
 
         for file_dic_one in path_dictionaries:
@@ -155,6 +174,7 @@ def create_file_text(file_path, destination_dir, file_text):
     f = open(f'{destination_dir}/{file_name}.txt', 'w+')
     f.write(file_text)
     f.close()
+
 
 # Convert PDF file to Image
 def convert_pdf_to_image_and_save(file_path, save_directory):
