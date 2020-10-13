@@ -4,6 +4,13 @@ import numpy as np
 
 # Function that searches words from the text extracted from a file
 def main_categorization(cats_df, file_path, file_text, search_whole_word):
+    '''
+    :param cats_df: Dataframe from provided Category Excel File,
+    :param file_path: File path for the Document
+    :param file_text:  Text Extracted from the document
+    :param search_whole_word: Whether to search words as whole or any appearance otherwise
+    :return: Returns Document Categorization in a dictionary
+    '''
     in_main_cats = []
     for index, row in cats_df.iterrows():
         main_cat_dir = row['CategoryChq']

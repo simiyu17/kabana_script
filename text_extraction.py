@@ -45,15 +45,16 @@ def text_from_image_file(file_path, doc_lang):
     return pytesseract.image_to_string(adaptive_thresh, config=doc_lang)
 
 
-# Extract text from an image file
+# Extract text from a licence size image file
 def text_from_licence_image_file(file_path, doc_lang):
     img = cv2.imread(file_path)
     img = resize_image_size(img)
     deskew = skew_correction(img)
     grayed = get_grayscale(deskew)
-    return pytesseract.image_to_string(grayed, config=doc_lang+' --psm 11')
+    return pytesseract.image_to_string(grayed, config=doc_lang + ' --psm 11')
 
 
+# Extract text from a receipt size image file
 def text_from_licence_plain_receipt_file(file_path, doc_lang):
     img = cv2.imread(file_path)
     img = resize_image_size(img)
@@ -105,7 +106,8 @@ def text_from_split_pdf_file(pdf_processing_folder, file_path, doc_lang):
             if not re.search('[a-zA-Z]+', return_text):
                 create_folder(pdf_processing_folder, 'PDF_IMAGES')
                 return_text = return_text + text_from_pdf_image_split_file(f'{pdf_processing_folder}/PDF_IMAGES',
-                                                                           f'{pdf_processing_folder}/{f}', doc_lang) + '\n'
+                                                                           f'{pdf_processing_folder}/{f}',
+                                                                           doc_lang) + '\n'
             # delete_file(f'{pdf_processing_folder}/{f}')
             counter += 1
     return return_text

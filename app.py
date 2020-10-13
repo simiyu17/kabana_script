@@ -15,6 +15,14 @@ args = parser.parse_args()
 
 
 def process_files(excel_cats_df, source_directory, output_directory, pdf_splitter_directory, search_whole_word, tess_dir):
+    '''
+    excel_cats_df: Catagorization Excel File,
+    source_directory: The directory path for the director containing Files to be categorized,
+    output_directory: The folder that will contain the categories
+    pdf_splitter_directory: a temporary folder that will temporarily contain split pdf docs
+    search_whole_word: Whether to search words as whole or any appearance otherwise
+    tess_dir: OCR tessdata directory
+    '''
 
     # Check if source folder and output folder both exist.
     if not os.path.exists(source_directory) or not os.path.exists(output_directory):
@@ -39,9 +47,9 @@ def process_files(excel_cats_df, source_directory, output_directory, pdf_splitte
                         custom_config = r'-l ' + str(file_path) + ' --tessdata-dir "' + tess_dir + '"'
                         file_full_text = extract_text_in_file(f'{source_directory}/{file_path}/{file_}',
                                                               pdf_splitter_directory, custom_config)
-                        # Remove Splitter folder
+                        # Remove Splitter folder Now it's use is no longer nequired for now
                         delete_dir(f'{output_path}/SPLITTER')
-                        # Check if text was extracted
+                        # Check if text was extracted and if not they are saved in FAILED DIR
                         if not re.search('[a-zA-Z]+', file_full_text):
                             create_folder(output_directory, 'FAILED')
                             move_file(f'{source_directory}/{file_path}/{file_}', f'{output_directory}/FAILED')
@@ -75,8 +83,9 @@ def process_files(excel_cats_df, source_directory, output_directory, pdf_splitte
                     # Extract Text from the file
                     custom_config = r' --tessdata-dir "' + tess_dir + '"'
                     file_full_text = extract_text_in_file(f'{source_directory}/{file_path}', pdf_splitter_directory, custom_config)
+                    # Remove Splitter folder Now it's use is no longer nequired for now
                     delete_dir(f'{output_path}/SPLITTER')
-                    # Check if text was extracted
+                    # Check if text was extracted and if not they are saved in FAILED DIR
                     if not re.search('[a-zA-Z]+', file_full_text):
                         create_folder(output_directory, 'FAILED')
                         move_file(f'{source_directory}/{file_path}', f'{output_directory}/FAILED')
@@ -114,6 +123,7 @@ if __name__ == "__main__":
     cats_df = pd.read_excel(categories_excel_source_path)
     cats_df['Keywords_cat'] = cats_df['Keywords_cat'].fillna(method='ffill')
 
+    # Process Given Documents
     process_files(cats_df, source_path, output_path, f'{output_path}/SPLITTER', search_whole_word, f'tessdata')
 
 

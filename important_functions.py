@@ -6,7 +6,7 @@ from pdf2image import convert_from_path
 ALLOWED_EXTENSIONS = {'pdf', 'png', 'jpg', 'jpeg'}
 
 
-# Check that file being processed is valid
+# Check that file being processed is valid for this script
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -14,6 +14,10 @@ def allowed_file(filename):
 
 # Move file to another directory
 def move_file(file_path, dst_dir):
+    '''
+    :param file_path: Path for Document to be moved
+    :param dst_dir: Destination directory
+    '''
     try:
         shutil.move(file_path, dst_dir)
     except OSError:
@@ -46,6 +50,7 @@ def delete_file(file_path):
         print("Deleting of the file %s failed" % file_path)
 
 
+# Delete Directory
 def delete_dir(dir_path):
     delete_files = []
     delete_dirs = []
@@ -63,6 +68,10 @@ def delete_dir(dir_path):
 
 # Create a directory inside another directory
 def create_folder(parent_dir, dir_to_create):
+    '''
+    :param parent_dir: Directory inside which we want to create another Directory
+    :param dir_to_create: Directory To be created
+    '''
     if os.path.exists(parent_dir) and not os.path.exists(f'{parent_dir}/{dir_to_create}'):
         try:
             os.makedirs(f'{parent_dir}/{dir_to_create}')
@@ -74,6 +83,12 @@ def create_folder(parent_dir, dir_to_create):
 
 # Search a WHOLE word in a given text
 def search_word_in_given_text(file_text, search_text, search_whole_word):
+    '''
+    :param file_text: Text extracted from a document
+    :param search_text: The keyword to be searched in the text
+    :param search_whole_word: Whether to search words as whole or any appearance otherwise
+    :return:
+    '''
     res_search = re.search(search_text, file_text, flags=re.IGNORECASE)
     if search_whole_word:
         res_search = re.search(r'\b{}\b'.format(search_text), file_text, flags=re.IGNORECASE)
@@ -169,6 +184,7 @@ def get_int_choice(int_choices_list, selection_texts):
     return choice
 
 
+# Create a .txt file for each processed file for verification
 def create_file_text(file_path, destination_dir, file_text):
     file_name = os.path.basename(file_path).split('.')[0]
     f = open(f'{destination_dir}/{file_name}.txt', 'w+')
