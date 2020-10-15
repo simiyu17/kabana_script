@@ -97,19 +97,14 @@ def text_from_split_pdf_file(pdf_processing_folder, file_path, doc_lang):
         output = f'{pdf_processing_folder}/Split-{page}.pdf'
         with open(output, 'wb') as output_pdf:
             pdf_writer.write(output_pdf)
-    counter = 1
-    tot_pages = pdf.getNumPages()
-    for f in os.listdir(pdf_processing_folder):
-        if not os.path.isdir(f'{pdf_processing_folder}/{f}'):
-            print(f'Processing Page {str(counter)}/{str(tot_pages)} of file ==>{file_path}')
-            return_text = return_text + convert_pdf_to_txt(f'{pdf_processing_folder}/{f}') + '\n'
-            if not re.search('[a-zA-Z]+', return_text):
-                create_folder(pdf_processing_folder, 'PDF_IMAGES')
-                return_text = return_text + text_from_pdf_image_split_file(f'{pdf_processing_folder}/PDF_IMAGES',
-                                                                           f'{pdf_processing_folder}/{f}',
-                                                                           doc_lang) + '\n'
-            # delete_file(f'{pdf_processing_folder}/{f}')
-            counter += 1
+        print(f'Processing Page {str(page)}/{str(pdf.getNumPages())} of file ==>{file_path}')
+        page_text = convert_pdf_to_txt(f'{pdf_processing_folder}/Split-{page}.pdf')
+        return_text = return_text + page_text + '\n'
+        if not re.search('[a-zA-Z]+', page_text):
+            create_folder(pdf_processing_folder, 'PDF_IMAGES')
+            return_text = return_text + text_from_pdf_image_split_file(f'{pdf_processing_folder}/PDF_IMAGES',
+                                                                       f'{pdf_processing_folder}/Split-{page}.pdf',
+                                                                       doc_lang) + '\n'
     return return_text
 
 
