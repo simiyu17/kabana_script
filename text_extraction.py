@@ -9,17 +9,17 @@ from important_functions import *
 
 
 # Overal text extraction from a file
-def extract_text_in_file(file_path, pdf_splitter_path, doc_language):
+def extract_text_in_file(file_path, pdf_splitter_path, custom_config):
     if file_path.lower().endswith('pdf'):
-        return text_from_split_pdf_file(pdf_splitter_path, file_path, doc_language)
+        return text_from_split_pdf_file(pdf_splitter_path, file_path, custom_config)
     elif file_path.endswith('JPG'):
-        return text_from_image_file(file_path, doc_language)
+        return text_from_image_file(file_path, custom_config)
     else:
-        return text_from_image_file_original(file_path, doc_language)
+        return text_from_image_file_original(file_path, custom_config)
 
 
 # Extract text from an image file
-def text_from_image_file_original(file_path, doc_lang):
+def text_from_image_file_original(file_path, custom_config):
     img = cv2.imread(file_path)
     img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     img_edges = cv2.Canny(img_gray, 100, 100, apertureSize=3)
@@ -31,36 +31,36 @@ def text_from_image_file_original(file_path, doc_lang):
         angles.append(angle)
     median_angle = np.median(angles)
     img_rotated = ndimage.rotate(img, median_angle)
-    return pytesseract.image_to_string(img_rotated, config=doc_lang)
+    return pytesseract.image_to_string(img_rotated, config=custom_config)
 
 
 # Extract text from an image file
-def text_from_image_file(file_path, doc_lang):
+def text_from_image_file(file_path, custom_config):
     img = cv2.imread(file_path)
     deskew = skew_correction(img)
     background_mask_removal = remove_water_mask(deskew)
     adaptive_thresh = cv2.adaptiveThreshold(background_mask_removal, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
                                             cv2.THRESH_BINARY, 31, 2)
     custom_config = r'--oem 3 -l eng+deu --psm 6'
-    return pytesseract.image_to_string(adaptive_thresh, config=doc_lang)
+    return pytesseract.image_to_string(adaptive_thresh, config=custom_config)
 
 
 # Extract text from a licence size image file
-def text_from_licence_image_file(file_path, doc_lang):
+def text_from_licence_image_file(file_path, custom_config):
     img = cv2.imread(file_path)
     img = resize_image_size(img)
     deskew = skew_correction(img)
     grayed = get_grayscale(deskew)
-    return pytesseract.image_to_string(grayed, config=doc_lang + ' --psm 11')
+    return pytesseract.image_to_string(grayed, config=custom_config + ' --psm 11')
 
 
 # Extract text from a receipt size image file
-def text_from_licence_plain_receipt_file(file_path, doc_lang):
+def text_from_licence_plain_receipt_file(file_path, custom_config):
     img = cv2.imread(file_path)
     img = resize_image_size(img)
     deskew = skew_correction(img)
     grayed = get_grayscale(deskew)
-    return pytesseract.image_to_string(grayed, config=doc_lang)
+    return pytesseract.image_to_string(grayed, config=custom_config)
 
 
 # Extract text from a pdf file
