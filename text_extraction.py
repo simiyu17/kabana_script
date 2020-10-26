@@ -22,6 +22,8 @@ def extract_text_in_file(file_path, pdf_splitter_path, custom_config):
 def text_from_image_file_original(file_path, custom_config):
     img = cv2.imread(file_path)
     img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    '''Start rotating the image to correct text orientation'''
     img_edges = cv2.Canny(img_gray, 100, 100, apertureSize=3)
     lines = cv2.HoughLinesP(img_edges, 1, math.pi / 180.0, 100, minLineLength=100, maxLineGap=5)
     angles = []
@@ -30,6 +32,8 @@ def text_from_image_file_original(file_path, custom_config):
         angle = math.degrees(math.atan2(y2 - y1, x2 - x1))
         angles.append(angle)
     median_angle = np.median(angles)
+
+    '''Correctly rotated image which is now ready for text extraction'''
     img_rotated = ndimage.rotate(img, median_angle)
     return pytesseract.image_to_string(img_rotated, config=custom_config)
 
@@ -78,9 +82,7 @@ def convert_pdf_to_txt(file_path):
     for page in PDFPage.get_pages(fp, pagenos, maxpages=maxpages, password=password, caching=caching,
                                   check_extractable=True):
         interpreter.process_page(page)
-
     text = retstr.getvalue()
-
     fp.close()
     device.close()
     retstr.close()
